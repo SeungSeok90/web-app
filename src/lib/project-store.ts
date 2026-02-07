@@ -7,7 +7,7 @@ interface ProjectStore {
     projects: Project[];
     members: Member[];
     registrations: Registration[];
-    addProject: (project: Omit<Project, 'id'>) => void;
+    addProject: (project: Pick<Project, 'name' | 'date' | 'location' | 'managerId' | 'status'>) => void;
     updateProject: (id: string, project: Partial<Project>) => void;
     deleteProject: (id: string) => void;
     addRegistration: (registration: Omit<Registration, 'id' | 'submittedAt'>) => void;
