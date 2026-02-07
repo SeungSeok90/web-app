@@ -2,6 +2,8 @@ import { INITIAL_PROJECTS } from '@/lib/mock-data';
 import EventPageClient from './EventPageClient';
 import { Metadata } from 'next';
 
+export const runtime = 'edge';
+
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
     const { id } = await params;
 
