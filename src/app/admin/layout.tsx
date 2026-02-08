@@ -34,7 +34,7 @@ export default function AdminLayout({
             // zustand persist가 복원될 때까지 기다려야 할 수도 있음.
             // 여기서는 간단하게 처리.
             if (!useAuthStore.getState().isAuthenticated) {
-                router.push('/login');
+                router.push('/');
             }
         };
         checkAuth();
