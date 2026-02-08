@@ -8,20 +8,25 @@ import PageMetadata from '@/components/PageMetadata';
 
 interface EventPageClientProps {
     id: string;
+    initialProject?: any; // Using any or Project type
 }
 
-export default function EventPageClient({ id }: EventPageClientProps) {
+export default function EventPageClient({ id, initialProject }: EventPageClientProps) {
     const { projects, registrations, fetchProjects, isLoading } = useProjectStore();
     const searchParams = useSearchParams();
     const isPreview = searchParams.get('preview') === 'true';
 
     useEffect(() => {
+        // Always fetch latest data to sync store, but we can show initialProject meanwhile
         fetchProjects();
     }, [fetchProjects]);
 
-    const project = projects.find((p) => p.id === id);
+    // Priority: Store Project > Initial Project
+    const project = projects.find((p) => p.id === id) || initialProject;
 
-    if (isLoading) {
+    // If we have no project and are loading, show loading.
+    // If we have initialProject, we don't show loading.
+    if (!project && isLoading) {
         return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
     }
 

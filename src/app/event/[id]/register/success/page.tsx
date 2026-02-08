@@ -1,56 +1,40 @@
-'use client';
-export const runtime = 'edge';
+import { supabase } from '@/lib/supabase';
+import SuccessClient from './SuccessClient';
 
-import { use, useEffect } from 'react';
-import { useProjectStore } from '@/lib/project-store';
-import Link from 'next/link';
-import { CheckCircle } from 'lucide-react';
-import { notFound } from 'next/navigation';
+export default async function SuccessPage({ params }: { params: Promise<{ id: string }> }) {
+    const { id } = await params;
 
-export default function RegistrationSuccessPage({ params }: { params: Promise<{ id: string }> }) {
-    const { id } = use(params);
-    const { projects, fetchProjects, isLoading } = useProjectStore();
-
-    useEffect(() => {
-        fetchProjects();
-    }, [fetchProjects]);
-
-    const project = projects.find((p) => p.id === id);
-
-    if (isLoading) {
-        return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
-    }
+    const { data: project } = await supabase
+        .from('projects')
+        .select('*')
+        .eq('id', id)
+        .single();
 
     if (!project) {
-        notFound();
+        return <div>Project not found</div>;
     }
 
-    const { themeColor } = project.landingPage;
-    const { successMessage } = project.notification || {};
+    // Mapper function
+    const mapProject = (p: any) => ({
+        id: p.id,
+        name: p.name,
+        date: p.date,
+        location: p.location,
+        managerId: p.manager_id,
+        status: p.status,
+        landingPage: p.landing_page,
+        registrationPage: p.registration_page,
+        design: p.design,
+        schedule: p.schedule,
+        policy: p.policy,
+        terms: p.terms,
+        notification: p.notification,
+        seo: p.seo,
+        createdAt: p.created_at,
+        updatedAt: p.updated_at,
+    });
 
-    return (
-        <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
-            <div className="max-w-md w-full bg-white rounded-xl shadow-lg p-8 text-center">
-                <div className="mb-6 flex justify-center">
-                    <CheckCircle className="w-16 h-16 text-green-500" />
-                </div>
+    const mappedProject = mapProject(project);
 
-                <h2 className="text-2xl font-bold text-gray-900 mb-4">
-                    신청이 완료되었습니다!
-                </h2>
-
-                <div className="text-gray-600 mb-8 whitespace-pre-line leading-relaxed">
-                    {successMessage || '이벤트 신청이 성공적으로 접수되었습니다.\n참여해 주셔서 감사합니다.'}
-                </div>
-
-                <Link
-                    href={`/event/${id}`}
-                    className="block w-full py-3 px-4 rounded-lg text-white font-bold shadow-md transition-transform hover:scale-105"
-                    style={{ backgroundColor: themeColor || '#3B82F6' }}
-                >
-                    확인
-                </Link>
-            </div>
-        </div>
-    );
+    return <SuccessClient params={params} initialProject={mappedProject} />;
 }
