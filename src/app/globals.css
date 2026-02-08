@@ -24,3 +24,9 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* Force default styles for form elements to ensure visibility */
+input, select, textarea {
+  color: #111827; /* gray-900 */
+  background-color: #ffffff;
+}
