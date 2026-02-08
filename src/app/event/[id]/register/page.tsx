@@ -1,7 +1,7 @@
 'use client';
 export const runtime = 'edge';
 
-import { useState, use } from 'react';
+import { useState, use, useEffect } from 'react';
 import { notFound, useRouter } from 'next/navigation';
 import { useProjectStore } from '@/lib/project-store';
 import { ArrowLeft } from 'lucide-react';
@@ -11,8 +11,17 @@ import PageMetadata from '@/components/PageMetadata';
 export default function RegisterPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = use(params);
     const router = useRouter();
-    const { projects, registrations, addRegistration } = useProjectStore();
+    const { projects, registrations, addRegistration, fetchProjects, isLoading } = useProjectStore();
+
+    useEffect(() => {
+        fetchProjects();
+    }, [fetchProjects]);
+
     const project = projects.find((p) => p.id === id);
+
+    if (isLoading) {
+        return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
+    }
 
     if (!project || !project.registrationPage.isEnabled) {
         notFound();

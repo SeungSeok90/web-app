@@ -1,4 +1,4 @@
-import { INITIAL_PROJECTS } from '@/lib/mock-data';
+import { supabase } from '@/lib/supabase';
 import EventPageClient from './EventPageClient';
 import { Metadata } from 'next';
 
@@ -7,23 +7,24 @@ export const runtime = 'edge';
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
     const { id } = await params;
 
-    // Find project in initial static data
-    // Note: Dynamic projects created by users (in localStorage) won't be found here by the server.
-    // They will receive default metadata unless we implement a real backend.
-    const project = INITIAL_PROJECTS.find(p => p.id === id);
+    const { data: project } = await supabase
+        .from('projects')
+        .select('seo, landing_page')
+        .eq('id', id)
+        .single();
 
-    if (!project || !project.landingPage.isEnabled) {
+    if (!project || !project.landing_page?.isEnabled) {
         return {
             title: '이벤트 페이지',
             description: '이벤트를 찾을 수 없습니다.',
         };
     }
 
-    const { title, description } = project.seo;
+    const { title, description } = project.seo || {};
 
     return {
-        title: title,
-        description: description,
+        title: title || '이벤트',
+        description: description || '',
     };
 }
 

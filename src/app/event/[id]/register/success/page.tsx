@@ -1,7 +1,7 @@
 'use client';
 export const runtime = 'edge';
 
-import { use } from 'react';
+import { use, useEffect } from 'react';
 import { useProjectStore } from '@/lib/project-store';
 import Link from 'next/link';
 import { CheckCircle } from 'lucide-react';
@@ -9,8 +9,17 @@ import { notFound } from 'next/navigation';
 
 export default function RegistrationSuccessPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = use(params);
-    const { projects } = useProjectStore();
+    const { projects, fetchProjects, isLoading } = useProjectStore();
+
+    useEffect(() => {
+        fetchProjects();
+    }, [fetchProjects]);
+
     const project = projects.find((p) => p.id === id);
+
+    if (isLoading) {
+        return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
+    }
 
     if (!project) {
         notFound();

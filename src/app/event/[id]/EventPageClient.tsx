@@ -2,6 +2,7 @@
 
 import { notFound, useSearchParams } from 'next/navigation';
 import { useProjectStore } from '@/lib/project-store';
+import { useEffect } from 'react';
 import Link from 'next/link';
 import PageMetadata from '@/components/PageMetadata';
 
@@ -10,11 +11,19 @@ interface EventPageClientProps {
 }
 
 export default function EventPageClient({ id }: EventPageClientProps) {
-    const { projects, registrations } = useProjectStore();
+    const { projects, registrations, fetchProjects, isLoading } = useProjectStore();
     const searchParams = useSearchParams();
     const isPreview = searchParams.get('preview') === 'true';
 
+    useEffect(() => {
+        fetchProjects();
+    }, [fetchProjects]);
+
     const project = projects.find((p) => p.id === id);
+
+    if (isLoading) {
+        return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
+    }
 
     if (!project || (!project.landingPage.isEnabled && !isPreview)) {
         notFound();

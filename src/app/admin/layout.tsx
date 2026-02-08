@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { useAuthStore } from '@/lib/auth-store';
+import { useProjectStore } from '@/lib/project-store';
 import {
     LayoutDashboard,
     FolderKanban,
@@ -21,6 +22,7 @@ export default function AdminLayout({
     children: React.ReactNode;
 }) {
     const { user, isAuthenticated, logout } = useAuthStore();
+    const { fetchProjects } = useProjectStore();
     const router = useRouter();
     const pathname = usePathname();
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -36,7 +38,10 @@ export default function AdminLayout({
             }
         };
         checkAuth();
-    }, [isAuthenticated, router]);
+
+        // Fetch data
+        fetchProjects();
+    }, [isAuthenticated, router, fetchProjects]);
 
     const handleLogout = () => {
         logout();
